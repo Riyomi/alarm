@@ -39,15 +39,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Text(
-      'Index 0: Home',
+      'Index 0: Alarm',
       style: optionStyle,
     ),
     Text(
-      'Index 1: Business',
+      'Index 1: Time',
       style: optionStyle,
     ),
     Text(
-      'Index 2: School',
+      'Index 2: Stopwatch',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 3: Timer',
       style: optionStyle,
     ),
   ];
@@ -70,16 +74,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
+            icon: Icon(Icons.access_alarm),
+            title: Text('Alarm'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            title: Text('Business'),
+            icon: Icon(Icons.access_time),
+            title: Text('Time'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            title: Text('School'),
+            icon: Icon(Icons.watch),
+            title: Text('Stopwatch'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.schedule),
+            title: Text('Timer'),
           ),
         ],
         currentIndex: _selectedIndex,
