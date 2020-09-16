@@ -20,8 +20,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: _title,
       home: MyStatefulWidget(),
+      theme: ThemeData(
+        // Define the default brightness and colors.
+        brightness: Brightness.dark,
+        primaryColor: Colors.lightBlue[800],
+        accentColor: Colors.cyan[600],
+        backgroundColor: Colors.black12,
+
+        // Define the default font family.
+        //fontFamily: 'Quicksand',
+
+        // Define the default TextTheme. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+       /* textTheme: TextTheme(
+          headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        ),*/
+      )
     );
   }
 }
@@ -67,6 +86,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('BottomNavigationBar Sample'),
+        backgroundColor: Colors.black12,
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
@@ -82,16 +102,18 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             title: Text('Time'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.watch),
+            icon: Icon(Icons.hourglass_empty),
             title: Text('Stopwatch'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.schedule),
+            icon: Icon(Icons.timer),
             title: Text('Timer'),
           ),
         ],
         currentIndex: _selectedIndex,
+        unselectedItemColor: Colors.white38,
         selectedItemColor: Colors.amber[800],
+        showUnselectedLabels: true,
         onTap: _onItemTapped,
       ),
     );
