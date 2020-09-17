@@ -43,6 +43,7 @@ class MyStatefulWidget extends StatefulWidget {
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
+  String _appBarTitle = 'Alarm';
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
@@ -67,6 +68,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if(index == 0) {
+        _appBarTitle = 'Alarm';
+      } else if (index == 1) {
+        _appBarTitle = 'Time';
+      } else if (index == 2) {
+        _appBarTitle = 'Stopwatch';
+      } else if (index == 3) {
+        _appBarTitle = 'Timer';
+      }
     });
   }
 
@@ -74,8 +84,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BottomNavigationBar Sample'),
+        title: Text(_appBarTitle),
         backgroundColor: Colors.black12,
+        centerTitle: true,
+        actions: [
+          _simplePopup(),
+        ],
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
@@ -108,3 +122,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     );
   }
 }
+
+Widget _simplePopup() => PopupMenuButton<int>(
+  itemBuilder: (context) => [
+    PopupMenuItem(
+      value: 1,
+      child: Text("Settings"),
+    ),
+  ],
+);
