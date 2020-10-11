@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -46,15 +48,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   String _appBarTitle = 'Alarm';
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     Text(
-      'Index 0: Alarm',
+      'Index 1: Alarm',
       style: optionStyle,
     ),
-    Text(
-      'Index 1: Time',
-      style: optionStyle,
-    ),
+    ClockWidget(),
     Text(
       'Index 2: Stopwatch',
       style: optionStyle,
@@ -131,3 +130,54 @@ Widget _simplePopup() => PopupMenuButton<int>(
     ),
   ],
 );
+
+class ClockWidget extends StatefulWidget {
+  @override
+  _ClockWidgetState createState() => _ClockWidgetState();
+}
+
+class _ClockWidgetState extends State<ClockWidget> {
+  String _now;
+  String _date;
+  Timer _everySecond;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        SizedBox(
+          height: 30,
+        ),
+        Text(_now,
+            style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
+        SizedBox(
+          height: 10,
+        ),
+        Text(_date,
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // sets first value
+    var now = DateTime.now();
+    _now = new DateFormat.Hms().format(now);
+    _date = new DateFormat.yMMMMEEEEd().format(now);
+
+    // defines a timer
+    _everySecond = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      if(mounted) {
+        setState(() {
+          var now = DateTime.now();
+          _now = new DateFormat.Hms().format(now);
+          _date = new DateFormat.yMMMMEEEEd().format(now);
+        });
+      }
+    });
+  }
+}
