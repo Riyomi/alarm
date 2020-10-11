@@ -49,10 +49,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 1: Alarm',
-      style: optionStyle,
-    ),
+    AlarmWidget(),
     ClockWidget(),
     Text(
       'Index 2: Stopwatch',
@@ -179,5 +176,42 @@ class _ClockWidgetState extends State<ClockWidget> {
         });
       }
     });
+  }
+}
+
+class AlarmWidget extends StatefulWidget {
+  @override
+  _AlarmWidget createState() => _AlarmWidget();
+}
+
+class _AlarmWidget extends State<AlarmWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(8),
+      children: <Widget>[
+        Container(
+          height: 50,
+          color: Colors.amber[600],
+          child: const Center(child: Text('Entry A')),
+        ),
+        Container(
+          height: 50,
+          color: Colors.amber[500],
+          child: const Center(child: Text('Entry B')),
+        ),
+        Container(
+          height: 50,
+          color: Colors.amber[100],
+          child: const Center(child: Text('Entry C')),
+        ),
+      ],
+    );
+  }
+  @override
+  void initState() {
+    super.initState();
+
+
   }
 }
