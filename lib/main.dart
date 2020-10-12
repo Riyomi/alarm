@@ -1,12 +1,13 @@
-import 'dart:async';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:alarm/alarm_widget.dart';
+import 'package:alarm/clock_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
 /// This Widget is the main application widget.
 class MyApp extends StatelessWidget {
-  static const String _title = 'Flutter Code Sample';
+  static const String _title = 'Clock';
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   String _appBarTitle = 'Alarm';
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static List<Widget> _widgetOptions = <Widget>[
+  List<Widget> _widgetOptions = <Widget>[
     AlarmWidget(),
     ClockWidget(),
     Text(
@@ -127,95 +128,3 @@ Widget _simplePopup() => PopupMenuButton<int>(
     ),
   ],
 );
-
-class ClockWidget extends StatefulWidget {
-  @override
-  _ClockWidgetState createState() => _ClockWidgetState();
-}
-
-class _ClockWidgetState extends State<ClockWidget> {
-  String _now;
-  String _date;
-  Timer _everySecond;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(
-          height: 30,
-        ),
-        Text(_now,
-            style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
-        SizedBox(
-          height: 10,
-        ),
-        Text(_date,
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // sets first value
-    var now = DateTime.now();
-    _now = new DateFormat.Hms().format(now);
-    _date = new DateFormat.yMMMMEEEEd().format(now);
-
-    // defines a timer
-    _everySecond = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if(mounted) {
-        setState(() {
-          var now = DateTime.now();
-          _now = new DateFormat.Hms().format(now);
-          _date = new DateFormat.yMMMMEEEEd().format(now);
-        });
-      }
-    });
-  }
-}
-
-class AlarmWidget extends StatefulWidget {
-  @override
-  _AlarmWidget createState() => _AlarmWidget();
-}
-
-class _AlarmWidget extends State<AlarmWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(8),
-      children: _createChildren(),
-    );
-  }
-  @override
-  void initState() {
-    super.initState();
-
-
-  }
-
-  List<Widget> _createChildren() {
-    return <Widget>[
-      Container(
-        height: 50,
-        color: Colors.amber[600],
-        child: const Center(child: Text('Entry A')),
-      ),
-      Container(
-        height: 50,
-        color: Colors.amber[500],
-        child: const Center(child: Text('Entry B')),
-      ),
-      Container(
-        height: 50,
-        color: Colors.amber[100],
-        child: const Center(child: Text('Entry C')),
-      ),
-    ];
-  }
-}
