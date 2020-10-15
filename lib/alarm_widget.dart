@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:alarm/alarm_class.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AlarmWidget extends StatefulWidget {
   @override
@@ -9,13 +10,11 @@ class AlarmWidget extends StatefulWidget {
 class _AlarmWidget extends State<AlarmWidget> {
   List<Widget> alarms;
   List<Alarm> alarmsList;
-  bool _value = false;
 
   @override
   Widget build(BuildContext context) {
-    alarms = _createChildren();
     return ListView.builder(
-        itemCount: alarms.length,
+        itemCount: alarms != null ? alarms.length : 0,
         itemBuilder: (context, index) {
           return Column(
             children: <Widget>[
@@ -31,64 +30,15 @@ class _AlarmWidget extends State<AlarmWidget> {
   @override
   void initState() {
     super.initState();
-  }
 
-  List<Widget> _createChildren() {
-    return <Widget>[
-      Container(
-        child: Row(
-          children: [
-            Text('08:10',
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-            Switch(
-              value: _value,
-              onChanged: (value){
-                setState(() {
-                  _value=value;
-                });
-              },
-              activeTrackColor: Colors.lightGreenAccent,
-              activeColor: Colors.green,
-            ),
-          ],
-        ),
-      ),
-      Container(
-        child: Row(
-          children: [
-            Text('08:10',
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-            Switch(
-              value: _value,
-              onChanged: (value){
-                setState(() {
-                  _value=value;
-                });
-              },
-              activeTrackColor: Colors.lightGreenAccent,
-              activeColor: Colors.green,
-            ),
-          ],
-        ),
-      ),
-      Container(
-        child: Row(
-          children: [
-            Text('08:10',
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-            Switch(
-              value: _value,
-              onChanged: (value){
-                setState(() {
-                  _value=value;
-                });
-              },
-              activeTrackColor: Colors.lightGreenAccent,
-              activeColor: Colors.green,
-            ),
-          ],
-        ),
-      ),
-    ];
+    SharedPreferences.getInstance().then((SharedPreferences prefs) {
+      if (prefs.getString('alarms') == null) {
+        prefs.setString('alarms', Alarm.encodeAlarms([new Alarm(id: 0, hour: 8, minute: 30, isActive: true)]));
+      } else {
+        alarms = Alarm.createAlarmWidgets(Alarm.decodeAlarms(prefs.getString('alarms')));
+      }
+      setState(() {});
+    });
+
   }
 }
