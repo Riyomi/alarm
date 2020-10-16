@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 
 class Alarm {
   int id, hour, minute;
@@ -39,32 +38,4 @@ class Alarm {
           .map<Alarm>((item) => Alarm.fromJson(item))
           .toList();
 
-  static List<Widget> createAlarmWidgets(List<Alarm> alarms) {
-    List<Widget> widgets = new List<Widget>();
-    for (Alarm alarm in alarms) {
-      widgets.add(new Container(
-        child: Row(
-          children: [
-            Text(alarm.hour.toString() + ":" + alarm.minute.toString(),
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-            Switch(
-              value: alarm.isActive,
-              onChanged: (value){
-                setState(() {
-                  alarm.isActive=value;
-                });
-              },
-              activeTrackColor: Colors.lightGreenAccent,
-              activeColor: Colors.green,
-            ),
-          ],
-        ),
-      ),);
-    }
-    return widgets;
-  }
-
-  static void setState(Null Function() param0) {
-
-  }
 }

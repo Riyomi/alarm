@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:alarm/alarm_widget.dart';
 import 'package:alarm/clock_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
@@ -50,7 +49,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   List<Widget> _widgetOptions = <Widget>[
-    AlarmWidget(),
+    AlarmsWidget(),
     ClockWidget(),
     Text(
       'Index 2: Stopwatch',

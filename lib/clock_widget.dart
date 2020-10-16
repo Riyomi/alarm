@@ -10,7 +10,6 @@ class ClockWidget extends StatefulWidget {
 class _ClockWidgetState extends State<ClockWidget> {
   String _now;
   String _date;
-  Timer _everySecond;
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +36,16 @@ class _ClockWidgetState extends State<ClockWidget> {
 
     // sets first value
     var now = DateTime.now();
-    _now = new DateFormat.Hms().format(now);
-    _date = new DateFormat.yMMMMEEEEd().format(now);
+    _now = DateFormat.Hms().format(now);
+    _date = DateFormat.yMMMMEEEEd().format(now);
 
     // defines a timer
-    _everySecond = Timer.periodic(Duration(seconds: 1), (Timer t) {
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
       if(mounted) {
         setState(() {
           var now = DateTime.now();
-          _now = new DateFormat.Hms().format(now);
-          _date = new DateFormat.yMMMMEEEEd().format(now);
+          _now = DateFormat.Hms().format(now);
+          _date = DateFormat.yMMMMEEEEd().format(now);
         });
       }
     });
