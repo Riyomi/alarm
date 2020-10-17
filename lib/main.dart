@@ -1,3 +1,4 @@
+import 'package:alarm/stop_watch_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:alarm/alarm_widget.dart';
 import 'package:alarm/clock_widget.dart';
@@ -51,10 +52,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   List<Widget> _widgetOptions = <Widget>[
     AlarmsWidget(),
     ClockWidget(),
-    Text(
-      'Index 2: Stopwatch',
-      style: optionStyle,
-    ),
+    StopwatchWidget(),
     Text(
       'Index 3: Timer',
       style: optionStyle,
@@ -94,19 +92,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.access_alarm),
-            title: Text('Alarm'),
+            label: 'Alarm',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.access_time),
-            title: Text('Time'),
+            label: 'Time',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.hourglass_empty),
-            title: Text('Stopwatch'),
+            label: 'Stopwatch',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.timer),
-            title: Text('Timer'),
+            label: 'Timer',
           ),
         ],
         currentIndex: _selectedIndex,
