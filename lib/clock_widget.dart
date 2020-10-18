@@ -16,16 +16,10 @@ class _ClockWidgetState extends State<ClockWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SizedBox(
-          height: 30,
-        ),
-        Text(_now,
-            style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
-        SizedBox(
-          height: 10,
-        ),
-        Text(_date,
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        SizedBox(height: 30),
+        Text(_now, style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
+        SizedBox(height: 10),
+        Text(_date, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
       ],
     );
   }

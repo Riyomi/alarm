@@ -5,7 +5,6 @@ import 'package:alarm/clock_widget.dart';
 
 void main() => runApp(MyApp());
 
-/// This Widget is the main application widget.
 class MyApp extends StatelessWidget {
   static const String _title = 'Clock';
 
@@ -16,22 +15,10 @@ class MyApp extends StatelessWidget {
       title: _title,
       home: MyStatefulWidget(),
       theme: ThemeData(
-        // Define the default brightness and colors.
         brightness: Brightness.dark,
         primaryColor: Colors.lightBlue[800],
         accentColor: Colors.cyan[600],
         backgroundColor: Colors.black12,
-
-        // Define the default font family.
-        //fontFamily: 'Quicksand',
-
-        // Define the default TextTheme. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
-       /* textTheme: TextTheme(
-          headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-          bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
-        ),*/
       )
     );
   }
@@ -53,23 +40,24 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     AlarmsWidget(),
     ClockWidget(),
     StopwatchWidget(),
-    Text(
-      'Index 3: Timer',
-      style: optionStyle,
-    ),
+    Text('Index 3: Timer', style: optionStyle),
   ];
 
-  void _onItemTapped(int index) {
+  _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if(index == 0) {
-        _appBarTitle = 'Alarm';
-      } else if (index == 1) {
-        _appBarTitle = 'Time';
-      } else if (index == 2) {
-        _appBarTitle = 'Stopwatch';
-      } else if (index == 3) {
-        _appBarTitle = 'Timer';
+      switch(index) {
+        case 0:
+          _appBarTitle = 'Alarm';
+          break;
+        case 1:
+          _appBarTitle = 'Clock';
+          break;
+        case 2:
+          _appBarTitle = 'Stopwatch';
+          break;
+        case 3:
+          _appBarTitle = 'Timer';
       }
     });
   }
@@ -96,7 +84,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.access_time),
-            label: 'Time',
+            label: 'Clock',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.hourglass_empty),
