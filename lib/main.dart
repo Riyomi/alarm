@@ -45,7 +45,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _selectedIndex = index; 
       switch(index) {
         case 0:
           _appBarTitle = 'Alarm';
