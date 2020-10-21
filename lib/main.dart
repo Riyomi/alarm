@@ -1,9 +1,33 @@
+import 'dart:isolate';
+import 'dart:ui';
 import 'package:alarm/stop_watch_widget.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:alarm/alarm_widget.dart';
 import 'package:alarm/clock_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'alarm_class.dart';
 
-void main() => runApp(MyApp());
+SendPort uiSendPort;
+const String isolateName = 'isolate';
+final ReceivePort port = ReceivePort();
+
+SharedPreferences prefs;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  AndroidAlarmManager.initialize();
+
+  IsolateNameServer.registerPortWithName(
+    port.sendPort,
+    isolateName,
+  );
+  prefs = await SharedPreferences.getInstance();
+  if (!prefs.containsKey('alarms')) {
+    await prefs.setString('alarms', Alarm.encodeAlarms([Alarm(id: 0, hour: 15, minute: 27, isActive: false)]));
+  }
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   static const String _title = 'Clock';

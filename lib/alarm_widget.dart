@@ -1,7 +1,10 @@
+import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:alarm/alarm_class.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:alarm/main.dart';
 
 class AlarmsWidget extends StatefulWidget {
   @override
@@ -31,21 +34,14 @@ class _AlarmsWidget extends State<AlarmsWidget> {
   @override
   void initState() {
     super.initState();
-
-    SharedPreferences.getInstance().then((SharedPreferences prefs) {
-      if (prefs.getString('alarms') == null) {
-        prefs.setString('alarms', Alarm.encodeAlarms([Alarm(id: 0, hour: 8, minute: 30, isActive: true)]));
-      } else {
-        alarms = createAlarmWidgets(Alarm.decodeAlarms(prefs.getString('alarms')));
-      }
-      setState(() {});
-    });
+     alarms = createAlarmWidgets(Alarm.decodeAlarms(prefs.getString('alarms')));
+     setState(() {});
   }
 
   List<Widget> createAlarmWidgets(List<Alarm> alarms) {
     List<Widget> widgets = List<Widget>();
     for (Alarm alarm in alarms) {
-     widgets.add(AlarmWidget(hour: alarm.hour, minute: alarm.minute, isActive: alarm.isActive));
+      widgets.add(AlarmWidget(hour: alarm.hour, minute: alarm.minute, isActive: alarm.isActive));
     }
     return widgets;
   }
@@ -77,6 +73,11 @@ class _AlarmWidget extends State<AlarmWidget> {
             onChanged: (value){
               setState(() {
                 _isActive=value;
+                if (_isActive) {
+                  DateTime now = new DateTime.now();
+                  setAlarm(now.year, now.month, now.day, _hour, _minute);
+                  print('Alarm set !');
+                }
               });
             },
             activeTrackColor: Colors.lightGreenAccent,
@@ -93,6 +94,27 @@ class _AlarmWidget extends State<AlarmWidget> {
     _hour = widget.hour;
     _minute = widget.minute;
     _isActive =widget.isActive;
+  }
+
+  static Future<void> callback() async {
+    FlutterRingtonePlayer.play(
+      android: AndroidSounds.notification,
+      ios: IosSounds.glass,
+      looping: false,
+      asAlarm: true, // Android only - all APIs
+    );
+    uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
+    uiSendPort?.send(null);
+  }
+
+  Future<void> setAlarm(int year, int month, int day, int hour, int minute) async {
+    await AndroidAlarmManager.oneShotAt(
+        DateTime(year, month, day, hour, minute),
+        // Ensure we have a unique alarm ID.
+        Random().nextInt(pow(2, 31)),
+        callback,
+        exact: true,
+        wakeup: true);
   }
 
 }
