@@ -24,7 +24,8 @@ Future<void> main() async {
   );
   prefs = await SharedPreferences.getInstance();
   if (!prefs.containsKey('alarms')) {
-    await prefs.setString('alarms', Alarm.encodeAlarms([Alarm(id: 0, hour: 15, minute: 27, isActive: false)]));
+    await prefs.setString('alarms',
+        Alarm.encodeAlarms([Alarm(id: 0, hour: 15, minute: 27, isActive: false)]));
   }
   runApp(MyApp());
 }
@@ -38,12 +39,17 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: _title,
       home: MyStatefulWidget(),
-      theme: ThemeData(
+      theme: ThemeData(primarySwatch: Colors.orange, brightness: Brightness.light),
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: Colors.lightBlue[800],
-        accentColor: Colors.cyan[600],
-        backgroundColor: Colors.black12,
-      )
+        snackBarTheme: SnackBarThemeData(
+            backgroundColor: Colors.white54
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.white54,
+        ),
+      ),
     );
   }
 }
@@ -91,7 +97,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
-        backgroundColor: Colors.black12,
         centerTitle: true,
         actions: [
           _simplePopup(),

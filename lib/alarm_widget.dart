@@ -17,18 +17,27 @@ class _AlarmsWidget extends State<AlarmsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: alarms != null ? alarms.length : 0,
-        itemBuilder: (context, index) {
-          return Column(
-            children: <Widget>[
-              alarms[index],
-              Divider(
-                color: Colors.white54,
-              ),
-            ],
-          );
-        }
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {},
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListView.builder(
+            itemCount: alarms != null ? alarms.length : 0,
+            itemBuilder: (context, index) {
+              return Column(
+                children: <Widget>[
+                  alarms[index],
+                  Divider(
+                    color: Colors.white54,
+                  ),
+                ],
+              );}
+        ),
+      ),
     );
   }
   @override
@@ -65,6 +74,7 @@ class _AlarmWidget extends State<AlarmWidget> {
   Widget build(BuildContext context) {
     return Container(
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(_hour.toString() + ":" + _minute.toString(),
               style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
@@ -74,9 +84,15 @@ class _AlarmWidget extends State<AlarmWidget> {
               setState(() {
                 _isActive=value;
                 if (_isActive) {
-                  DateTime now = new DateTime.now();
+                  DateTime now = DateTime.now();
                   setAlarm(now.year, now.month, now.day, _hour, _minute);
-                  print('Alarm set !');
+                  Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        //TODO: simplify the string if possible
+                        content: Text('Alarm set to '+_hour.toString()+':'+_minute.toString()),
+                        duration: Duration(seconds: 2),
+                      )
+                  );
                 }
               });
             },
@@ -116,5 +132,4 @@ class _AlarmWidget extends State<AlarmWidget> {
         exact: true,
         wakeup: true);
   }
-
 }
