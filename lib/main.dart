@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:alarm/alarm_widget.dart';
 import 'package:alarm/clock_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'alarm_class.dart';
+import 'package:alarm/alarm_class.dart';
+import 'package:alarm/timer_widget.dart';
 
 SendPort uiSendPort;
 const String isolateName = 'isolate';
@@ -64,13 +65,11 @@ class MyStatefulWidget extends StatefulWidget {
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   String _appBarTitle = 'Alarm';
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   List<Widget> _widgetOptions = <Widget>[
     AlarmsWidget(),
     ClockWidget(),
     StopwatchWidget(),
-    Text('Index 3: Timer', style: optionStyle),
+    TimerWidget(),
   ];
 
   _onItemTapped(int index) {
