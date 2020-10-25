@@ -5,6 +5,7 @@ import 'package:alarm/alarm_class.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:alarm/main.dart';
+import 'package:intl/intl.dart';
 
 class AlarmsWidget extends StatefulWidget {
   @override
@@ -21,53 +22,121 @@ class _AlarmsWidget extends State<AlarmsWidget> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          Future<TimeOfDay> selectedTime = showTimePicker(
+            initialTime: TimeOfDay.now(),
+            context: context,
+            builder: (BuildContext context, Widget child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                child: child,
+              );
+            },
+          );
+          selectedTime.then((time) => {
+            addNewAlarm(time.hour, time.minute)
+          }
+          );
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
             itemCount: alarms != null ? alarms.length : 0,
             itemBuilder: (context, index) {
+              final alarm = alarms[index];
+              final alarmWidget = alarmsList[index];
               return Column(
-                children: <Widget>[
-                  alarms[index],
-                  Divider(
-                    color: Colors.white54,
+                children: <Widget> [
+                  Dismissible(
+                    key: Key(alarm.hashCode.toString()),
+                    onDismissed: (direction) {
+                      setState(() {
+                        alarms.removeAt(index);
+                        removeAlarm(index);
+                      });
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text("Alarm deleted"),
+                              action: SnackBarAction(
+                              label: "UNDO",
+                              onPressed: () {
+                                setState(() {
+                                  alarms.insert(index, alarm);
+                                  addNewAlarm(alarmWidget.hour, alarmWidget.minute);
+                                });
+                              })
+                          ));
+                    },
+                    background: stackBehindDismiss('left'),
+                    secondaryBackground: stackBehindDismiss('right'),
+                    child: alarms[index]
                   ),
+                  Divider(color: Colors.white54)
                 ],
-              );}
+              );
+            }
         ),
       ),
     );
   }
+
+  void addNewAlarm(int hour, int minute) {
+    alarmsList.add(Alarm(id: alarmsList.last.id+1, hour: hour, minute: minute, isActive: false));
+    prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
+    setState(() {
+      alarms = createAlarmWidgets(alarmsList);
+    });
+  }
+  
+  void removeAlarm(int index) {
+    alarmsList.removeAt(index);
+    prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
+    setState(() {
+      alarms = createAlarmWidgets(alarmsList);
+    });
+  }
+
+  Widget stackBehindDismiss(String direction) {
+    return Container(
+      alignment: direction == 'right' ? Alignment.centerRight : Alignment.centerLeft,
+      padding: EdgeInsets.only(right: 20.0, left: 20.0),
+      color: Colors.red,
+      child: Icon(
+        Icons.delete,
+        color: Colors.white,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-     alarms = createAlarmWidgets(Alarm.decodeAlarms(prefs.getString('alarms')));
+     alarmsList  = Alarm.decodeAlarms(prefs.getString('alarms'));
+     alarms = createAlarmWidgets(alarmsList);
      setState(() {});
   }
 
   List<Widget> createAlarmWidgets(List<Alarm> alarms) {
     List<Widget> widgets = List<Widget>();
     for (Alarm alarm in alarms) {
-      widgets.add(AlarmWidget(hour: alarm.hour, minute: alarm.minute, isActive: alarm.isActive));
+      widgets.add(AlarmWidget(id: alarm.id, hour: alarm.hour, minute: alarm.minute, isActive: alarm.isActive));
     }
     return widgets;
   }
 }
 
 class AlarmWidget extends StatefulWidget {
-  final int hour, minute;
+  final int id, hour, minute;
   final bool isActive;
   @override
   _AlarmWidget createState() => _AlarmWidget();
 
-  AlarmWidget({Key key, this.hour, this.minute, this.isActive}): super(key: key);
+  AlarmWidget({Key key, this.id, this.hour, this.minute, this.isActive}): super(key: key);
 }
 
 class _AlarmWidget extends State<AlarmWidget> {
-  int _hour;
-  int _minute;
+  TimeOfDay _time;
   bool _isActive;
 
   @override
@@ -76,8 +145,7 @@ class _AlarmWidget extends State<AlarmWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(_hour.toString() + ":" + _minute.toString(),
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+          Text(convertTimeOfDay(_time), style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
           Switch(
             value: _isActive,
             onChanged: (value){
@@ -85,11 +153,10 @@ class _AlarmWidget extends State<AlarmWidget> {
                 _isActive=value;
                 if (_isActive) {
                   DateTime now = DateTime.now();
-                  setAlarm(now.year, now.month, now.day, _hour, _minute);
+                  setAlarm(now.year, now.month, now.day, _time.hour, _time.minute);
                   Scaffold.of(context).showSnackBar(
                       SnackBar(
-                        //TODO: simplify the string if possible
-                        content: Text('Alarm set to '+_hour.toString()+':'+_minute.toString()),
+                        content: Text('Alarm set to ' + convertTimeOfDay(_time)),
                         duration: Duration(seconds: 2),
                       )
                   );
@@ -107,9 +174,8 @@ class _AlarmWidget extends State<AlarmWidget> {
   @override
   void initState() {
     super.initState();
-    _hour = widget.hour;
-    _minute = widget.minute;
-    _isActive =widget.isActive;
+    _time = TimeOfDay(hour: widget.hour, minute: widget.minute);
+    _isActive = widget.isActive;
   }
 
   static Future<void> callback() async {
@@ -126,10 +192,13 @@ class _AlarmWidget extends State<AlarmWidget> {
   Future<void> setAlarm(int year, int month, int day, int hour, int minute) async {
     await AndroidAlarmManager.oneShotAt(
         DateTime(year, month, day, hour, minute),
-        // Ensure we have a unique alarm ID.
-        Random().nextInt(pow(2, 31)),
+        Random().nextInt(pow(2, 31)), // Ensure we have a unique alarm ID.
         callback,
         exact: true,
         wakeup: true);
+  }
+
+  String convertTimeOfDay(TimeOfDay timeOfDay) {
+    return DateFormat('HH:mm').format(DateFormat.jm().parse(timeOfDay.format(context)));
   }
 }
