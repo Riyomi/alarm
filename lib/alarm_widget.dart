@@ -5,7 +5,6 @@ import 'package:alarm/alarm_class.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:alarm/main.dart';
-import 'package:intl/intl.dart';
 
 class AlarmsWidget extends StatefulWidget {
   @override
@@ -51,25 +50,46 @@ class _AlarmsWidget extends State<AlarmsWidget> {
                   Dismissible(
                     key: Key(alarm.hashCode.toString()),
                     onDismissed: (direction) {
-                      setState(() {
-                        alarms.removeAt(index);
-                        removeAlarm(index);
-                      });
-                      Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text("Alarm deleted"),
-                              action: SnackBarAction(
-                              label: "UNDO",
-                              onPressed: () {
-                                setState(() {
-                                  alarms.insert(index, alarm);
-                                  addNewAlarm(alarmWidget.hour, alarmWidget.minute);
-                                });
-                              })
-                          ));
+                      if (direction == DismissDirection.startToEnd) {
+                        Future<TimeOfDay> selectedTime = showTimePicker(
+                          initialTime: TimeOfDay(hour: alarmWidget.hour, minute: alarmWidget.minute),
+                          context: context,
+                          builder: (BuildContext context, Widget child) {
+                            return MediaQuery(
+                              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                              child: child,
+                            );
+                          },
+                        );
+                        selectedTime.then((time) => {
+                          if (time == null) {
+                            modifyAlarm(index, alarmWidget.hour, alarmWidget.minute)
+                          } else {
+                            modifyAlarm(index, time.hour, time.minute)
+                          }
+                        }
+                        );
+                      } else {
+                        setState(() {
+                          alarms.removeAt(index);
+                          removeAlarm(index);
+                        });
+                        Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text("Alarm deleted"),
+                                action: SnackBarAction(
+                                    label: "UNDO",
+                                    onPressed: () {
+                                      setState(() {
+                                        alarms.insert(index, alarm);
+                                        addNewAlarm(alarmWidget.hour, alarmWidget.minute);
+                                      });
+                                    })
+                            ));
+                      }
                     },
-                    background: stackBehindDismiss('left'),
-                    secondaryBackground: stackBehindDismiss('right'),
+                    background: modifyBackground(),
+                    secondaryBackground: deleteBackground(),
                     child: alarms[index]
                   ),
                   Divider(color: Colors.white54)
@@ -97,13 +117,34 @@ class _AlarmsWidget extends State<AlarmsWidget> {
     });
   }
 
-  Widget stackBehindDismiss(String direction) {
+  void modifyAlarm(int index, int hour, int minute) {
+    alarmsList.elementAt(index).hour = hour;
+    alarmsList.elementAt(index).minute = minute;
+    prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
+    setState(() {
+      alarms = createAlarmWidgets(alarmsList);
+    });
+  }
+
+  Widget deleteBackground() {
     return Container(
-      alignment: direction == 'right' ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: Alignment.centerRight,
       padding: EdgeInsets.only(right: 20.0, left: 20.0),
       color: Colors.red,
       child: Icon(
         Icons.delete,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget modifyBackground() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.only(right: 20.0, left: 20.0),
+      color: Colors.lime,
+      child: Icon(
+        Icons.update,
         color: Colors.white,
       ),
     );
@@ -199,6 +240,7 @@ class _AlarmWidget extends State<AlarmWidget> {
   }
 
   String convertTimeOfDay(TimeOfDay timeOfDay) {
-    return DateFormat('HH:mm').format(DateFormat.jm().parse(timeOfDay.format(context)));
+    return timeOfDay.hour.toString().padLeft(2, '0') + ':'
+         + timeOfDay.minute.toString().padLeft(2, '0');
   }
 }
