@@ -24,6 +24,7 @@ class _StopwatchWidget extends State<StopwatchWidget> {
             ElevatedButton(
               child: Row(
                 children: <Widget> [
+                  //TODO: change the buttons to round ones without all this color bs (see Google's app as a reference)
                   _stopwatchStarted ? Icon(Icons.pause) : Icon(Icons.play_arrow),
                   _stopwatchStarted ? Text('Pause') : Text('Start'),
                 ]

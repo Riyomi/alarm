@@ -46,6 +46,7 @@ class _AlarmsWidget extends State<AlarmsWidget> {
               final alarm = alarms[index];
               final alarmWidget = alarmsList[index];
               return Column(
+                // TODO: when the item is not removed, put it back to its original position (now it's placed to the end)
                 children: <Widget> [
                   Dismissible(
                     key: Key(alarm.hashCode.toString()),

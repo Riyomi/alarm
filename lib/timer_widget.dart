@@ -1,6 +1,5 @@
-import 'dart:async';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:numeric_keyboard/numeric_keyboard.dart';
 
 class TimerWidget extends StatefulWidget {
   @override
@@ -8,40 +7,68 @@ class TimerWidget extends StatefulWidget {
 }
 
 class _TimerWidgetState extends State<TimerWidget> {
-  String _now;
-  String _date;
+  String _text = "";
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(height: 30),
-        Text(_now, style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        Text(_date, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-      ],
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Visibility(
+        child: FloatingActionButton(
+          child: Icon(Icons.play_arrow_rounded),
+          onPressed: () {
+            print(convertStringToDuration(_text.padLeft(6, '0')));
+          },
+        ),
+        visible: _text.length > 0 ? true : false,
+      ),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: 90),
+          Text(formatTimer(_text.padLeft(6, '0')), style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
+          NumericKeyboard(
+            textColor: Colors.white,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            onKeyboardTap: _onKeyboardTap,
+            rightIcon: Icon(Icons.backspace, color: Colors.white),
+            rightButtonFn: () {
+              setState(() {
+                if (_text.length > 0) {
+                  _text = _text.substring(0, _text.length - 1);
+                }
+              });
+            },
+          ),
+        ],
+      )
     );
   }
 
   @override
   void initState() {
     super.initState();
+  }
 
-    // sets first value
-    var now = DateTime.now();
-    _now = DateFormat.Hms().format(now);
-    _date = DateFormat.yMMMMEEEEd().format(now);
-
-    // defines a timer
-    Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if(mounted) {
-        setState(() {
-          var now = DateTime.now();
-          _now = DateFormat.Hms().format(now);
-          _date = DateFormat.yMMMMEEEEd().format(now);
-        });
+  _onKeyboardTap(String value) {
+    setState(() {
+      if(_text.length < 6) {
+        if (!(value == '0' && _text.length == 0)) {
+          _text += value;
+        }
       }
     });
   }
+
+  String formatTimer(String data) {
+    return data.substring(0, 2) + ":" + data.substring(2, 4) + ":" + data.substring(4, 6);
+  }
+
+  Duration convertStringToDuration(String data) {
+    int seconds = int.parse(data.substring(0, 2)) * 60 * 60 // hours
+                + int.parse(data.substring(2, 4)) * 60      // minutes
+                + int.parse(data.substring(4, 6));          // seconds
+    return Duration(seconds: seconds);
+  }
+
 }
