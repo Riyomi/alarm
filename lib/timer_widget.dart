@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:numeric_keyboard/numeric_keyboard.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class TimerWidget extends StatefulWidget {
   @override
@@ -11,37 +12,41 @@ class _TimerWidgetState extends State<TimerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    return TimersWithCarousel();
+  }
+
+  Widget addTimerWidget() {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Visibility(
-        child: FloatingActionButton(
-          child: Icon(Icons.play_arrow_rounded),
-          onPressed: () {
-            print(convertStringToDuration(_text.padLeft(6, '0')));
-          },
-        ),
-        visible: _text.length > 0 ? true : false,
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SizedBox(height: 90),
-          Text(formatTimer(_text.padLeft(6, '0')), style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
-          NumericKeyboard(
-            textColor: Colors.white,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            onKeyboardTap: _onKeyboardTap,
-            rightIcon: Icon(Icons.backspace, color: Colors.white),
-            rightButtonFn: () {
-              setState(() {
-                if (_text.length > 0) {
-                  _text = _text.substring(0, _text.length - 1);
-                }
-              });
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Visibility(
+          child: FloatingActionButton(
+            child: Icon(Icons.play_arrow_rounded),
+            onPressed: () {
+              print(convertStringToDuration(_text.padLeft(6, '0')));
             },
           ),
-        ],
-      )
+          visible: _text.length > 0 ? true : false,
+        ),
+        body: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SizedBox(height: 90),
+            Text(formatTimer(_text.padLeft(6, '0')), style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
+            NumericKeyboard(
+              textColor: Colors.white,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              onKeyboardTap: _onKeyboardTap,
+              rightIcon: Icon(Icons.backspace, color: Colors.white),
+              rightButtonFn: () {
+                setState(() {
+                  if (_text.length > 0) {
+                    _text = _text.substring(0, _text.length - 1);
+                  }
+                });
+              },
+            ),
+          ],
+        )
     );
   }
 
@@ -66,9 +71,77 @@ class _TimerWidgetState extends State<TimerWidget> {
 
   Duration convertStringToDuration(String data) {
     int seconds = int.parse(data.substring(0, 2)) * 60 * 60 // hours
-                + int.parse(data.substring(2, 4)) * 60      // minutes
-                + int.parse(data.substring(4, 6));          // seconds
+        + int.parse(data.substring(2, 4)) * 60      // minutes
+        + int.parse(data.substring(4, 6));          // seconds
     return Duration(seconds: seconds);
   }
+}
 
+class TimersWithCarousel extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _TimersWithCarouselState();
+  }
+}
+
+class _TimersWithCarouselState extends State<TimersWithCarousel> {
+  int _current = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton:
+        FloatingActionButton(
+          child: Icon(Icons.play_arrow_rounded),
+          onPressed: () {},
+        ),
+      body: Row(
+          //crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CarouselSlider(
+              items: [1,2,3,4,5].map((i) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                            color: Colors.amber
+                        ),
+                        child: Text('text $i', style: TextStyle(fontSize: 16.0),)
+                    );
+                  },
+                );
+              }).toList(),
+              options: CarouselOptions(
+                  scrollDirection: Axis.vertical,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _current = index;
+                    });
+                  }
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [1,2,3,4,5].map((url) {
+                int index = [1,2,3,4,5].indexOf(url);
+                return Container(
+                  width: 8.0,
+                  height: 8.0,
+                  margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _current == index
+                        ? Color.fromRGBO(0, 0, 0, 0.9)
+                        : Color.fromRGBO(0, 0, 0, 0.4),
+                  ),
+                );
+              }).toList(),
+            ),
+          ]
+      ),
+    );
+  }
 }
