@@ -19,7 +19,8 @@ class _ClockWidgetState extends State<ClockWidget> {
         SizedBox(height: 30),
         Text(_now, style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
         SizedBox(height: 10),
-        Text(_date, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        Text(_date,
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -35,7 +36,7 @@ class _ClockWidgetState extends State<ClockWidget> {
 
     // defines a timer
     Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           var now = DateTime.now();
           _now = DateFormat.Hms().format(now);

@@ -27,15 +27,13 @@ class _AlarmsWidget extends State<AlarmsWidget> {
             context: context,
             builder: (BuildContext context, Widget child) {
               return MediaQuery(
-                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                data: MediaQuery.of(context)
+                    .copyWith(alwaysUse24HourFormat: true),
                 child: child,
               );
             },
           );
-          selectedTime.then((time) => {
-            addNewAlarm(time.hour, time.minute)
-          }
-          );
+          selectedTime.then((time) => {addNewAlarm(time.hour, time.minute)});
         },
       ),
       body: Padding(
@@ -47,69 +45,74 @@ class _AlarmsWidget extends State<AlarmsWidget> {
               final alarmWidget = alarmsList[index];
               return Column(
                 // TODO: when the item is not removed, put it back to its original position (now it's placed to the end)
-                children: <Widget> [
+                children: <Widget>[
                   Dismissible(
-                    key: Key(alarm.hashCode.toString()),
-                    onDismissed: (direction) {
-                      if (direction == DismissDirection.startToEnd) {
-                        Future<TimeOfDay> selectedTime = showTimePicker(
-                          initialTime: TimeOfDay(hour: alarmWidget.hour, minute: alarmWidget.minute),
-                          context: context,
-                          builder: (BuildContext context, Widget child) {
-                            return MediaQuery(
-                              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-                              child: child,
-                            );
-                          },
-                        );
-                        selectedTime.then((time) => {
-                          if (time == null) {
-                            modifyAlarm(index, alarmWidget.hour, alarmWidget.minute)
-                          } else {
-                            modifyAlarm(index, time.hour, time.minute)
-                          }
+                      key: Key(alarm.hashCode.toString()),
+                      onDismissed: (direction) {
+                        if (direction == DismissDirection.startToEnd) {
+                          Future<TimeOfDay> selectedTime = showTimePicker(
+                            initialTime: TimeOfDay(
+                                hour: alarmWidget.hour,
+                                minute: alarmWidget.minute),
+                            context: context,
+                            builder: (BuildContext context, Widget child) {
+                              return MediaQuery(
+                                data: MediaQuery.of(context)
+                                    .copyWith(alwaysUse24HourFormat: true),
+                                child: child,
+                              );
+                            },
+                          );
+                          selectedTime.then((time) => {
+                                if (time == null)
+                                  {
+                                    modifyAlarm(index, alarmWidget.hour,
+                                        alarmWidget.minute)
+                                  }
+                                else
+                                  {modifyAlarm(index, time.hour, time.minute)}
+                              });
+                        } else {
+                          setState(() {
+                            alarms.removeAt(index);
+                            removeAlarm(index);
+                          });
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text("Alarm deleted"),
+                              action: SnackBarAction(
+                                  label: "UNDO",
+                                  onPressed: () {
+                                    setState(() {
+                                      alarms.insert(index, alarm);
+                                      addNewAlarm(
+                                          alarmWidget.hour, alarmWidget.minute);
+                                    });
+                                  })));
                         }
-                        );
-                      } else {
-                        setState(() {
-                          alarms.removeAt(index);
-                          removeAlarm(index);
-                        });
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text("Alarm deleted"),
-                                action: SnackBarAction(
-                                    label: "UNDO",
-                                    onPressed: () {
-                                      setState(() {
-                                        alarms.insert(index, alarm);
-                                        addNewAlarm(alarmWidget.hour, alarmWidget.minute);
-                                      });
-                                    })
-                            ));
-                      }
-                    },
-                    background: modifyBackground(),
-                    secondaryBackground: deleteBackground(),
-                    child: alarms[index]
-                  ),
+                      },
+                      background: modifyBackground(),
+                      secondaryBackground: deleteBackground(),
+                      child: alarms[index]),
                   Divider(color: Colors.white54)
                 ],
               );
-            }
-        ),
+            }),
       ),
     );
   }
 
   void addNewAlarm(int hour, int minute) {
-    alarmsList.add(Alarm(id: alarmsList.last.id+1, hour: hour, minute: minute, isActive: false));
+    alarmsList.add(Alarm(
+        id: alarmsList.last.id + 1,
+        hour: hour,
+        minute: minute,
+        isActive: false));
     prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
     setState(() {
       alarms = createAlarmWidgets(alarmsList);
     });
   }
-  
+
   void removeAlarm(int index) {
     alarmsList.removeAt(index);
     prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
@@ -154,15 +157,19 @@ class _AlarmsWidget extends State<AlarmsWidget> {
   @override
   void initState() {
     super.initState();
-     alarmsList  = Alarm.decodeAlarms(prefs.getString('alarms'));
-     alarms = createAlarmWidgets(alarmsList);
-     setState(() {});
+    alarmsList = Alarm.decodeAlarms(prefs.getString('alarms'));
+    alarms = createAlarmWidgets(alarmsList);
+    setState(() {});
   }
 
   List<Widget> createAlarmWidgets(List<Alarm> alarms) {
     List<Widget> widgets = List<Widget>();
     for (Alarm alarm in alarms) {
-      widgets.add(AlarmWidget(id: alarm.id, hour: alarm.hour, minute: alarm.minute, isActive: alarm.isActive));
+      widgets.add(AlarmWidget(
+          id: alarm.id,
+          hour: alarm.hour,
+          minute: alarm.minute,
+          isActive: alarm.isActive));
     }
     return widgets;
   }
@@ -171,10 +178,12 @@ class _AlarmsWidget extends State<AlarmsWidget> {
 class AlarmWidget extends StatefulWidget {
   final int id, hour, minute;
   final bool isActive;
+
   @override
   _AlarmWidget createState() => _AlarmWidget();
 
-  AlarmWidget({Key key, this.id, this.hour, this.minute, this.isActive}): super(key: key);
+  AlarmWidget({Key key, this.id, this.hour, this.minute, this.isActive})
+      : super(key: key);
 }
 
 class _AlarmWidget extends State<AlarmWidget> {
@@ -187,21 +196,21 @@ class _AlarmWidget extends State<AlarmWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(convertTimeOfDay(_time), style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
+          Text(convertTimeOfDay(_time),
+              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
           Switch(
             value: _isActive,
-            onChanged: (value){
+            onChanged: (value) {
               setState(() {
-                _isActive=value;
+                _isActive = value;
                 if (_isActive) {
                   DateTime now = DateTime.now();
-                  setAlarm(now.year, now.month, now.day, _time.hour, _time.minute);
-                  Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Alarm set to ' + convertTimeOfDay(_time)),
-                        duration: Duration(seconds: 2),
-                      )
-                  );
+                  setAlarm(
+                      now.year, now.month, now.day, _time.hour, _time.minute);
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text('Alarm set to ' + convertTimeOfDay(_time)),
+                    duration: Duration(seconds: 2),
+                  ));
                 }
               });
             },
@@ -231,7 +240,8 @@ class _AlarmWidget extends State<AlarmWidget> {
     uiSendPort?.send(null);
   }
 
-  Future<void> setAlarm(int year, int month, int day, int hour, int minute) async {
+  Future<void> setAlarm(int year, int month, int day, int hour,
+      int minute) async {
     await AndroidAlarmManager.oneShotAt(
         DateTime(year, month, day, hour, minute),
         Random().nextInt(pow(2, 31)), // Ensure we have a unique alarm ID.
@@ -241,7 +251,8 @@ class _AlarmWidget extends State<AlarmWidget> {
   }
 
   String convertTimeOfDay(TimeOfDay timeOfDay) {
-    return timeOfDay.hour.toString().padLeft(2, '0') + ':'
-         + timeOfDay.minute.toString().padLeft(2, '0');
+    return timeOfDay.hour.toString().padLeft(2, '0') +
+        ':' +
+        timeOfDay.minute.toString().padLeft(2, '0');
   }
 }

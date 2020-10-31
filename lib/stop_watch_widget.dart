@@ -22,37 +22,30 @@ class _StopwatchWidget extends State<StopwatchWidget> {
         ButtonBar(
           children: [
             ElevatedButton(
-              child: Row(
-                children: <Widget> [
+                child: Row(children: <Widget>[
                   //TODO: change the buttons to round ones without all this color bs (see Google's app as a reference)
-                  _stopwatchStarted ? Icon(Icons.pause) : Icon(Icons.play_arrow),
+                  _stopwatchStarted
+                      ? Icon(Icons.pause)
+                      : Icon(Icons.play_arrow),
                   _stopwatchStarted ? Text('Pause') : Text('Start'),
-                ]
-              ),
-              style: _stopwatchStarted ?
-                    ElevatedButton.styleFrom(primary: Colors.lime) :
-                    ElevatedButton.styleFrom(primary: Colors.green),
-              onPressed: () {
-                if (_stopwatchStarted) {
-                  pauseStopwatch();
-                } else {
-                  startStopwatch();
-                }
-                _stopwatchStarted = !_stopwatchStarted;
-              }
-            ),
+                ]),
+                style: _stopwatchStarted
+                    ? ElevatedButton.styleFrom(primary: Colors.lime)
+                    : ElevatedButton.styleFrom(primary: Colors.green),
+                onPressed: () {
+                  if (_stopwatchStarted) {
+                    pauseStopwatch();
+                  } else {
+                    startStopwatch();
+                  }
+                  _stopwatchStarted = !_stopwatchStarted;
+                }),
             ElevatedButton(
                 child: Row(
-                  children: [
-                    Icon(Icons.stop),
-                    Text('Reset')
-                  ],
+                  children: [Icon(Icons.stop), Text('Reset')],
                 ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red
-                ),
-                onPressed: resetStopwatch
-            )
+                style: ElevatedButton.styleFrom(primary: Colors.red),
+                onPressed: resetStopwatch)
           ],
           alignment: MainAxisAlignment.center,
         ),
@@ -63,7 +56,7 @@ class _StopwatchWidget extends State<StopwatchWidget> {
   startStopwatch() {
     _stopwatch.start();
     Timer.periodic(Duration(milliseconds: 10), (Timer t) {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _elapsedTime = _stopwatch.elapsed;
         });
@@ -81,7 +74,7 @@ class _StopwatchWidget extends State<StopwatchWidget> {
     _stopwatchStarted = false;
   }
 
-  format(Duration d) => d.toString().substring(0,10).padLeft(8, "0");
+  format(Duration d) => d.toString().substring(0, 10).padLeft(8, "0");
 
   // https://stackoverflow.com/questions/53228993/how-to-implement-persistent-stopwatch-in-flutter
 }

@@ -25,8 +25,10 @@ Future<void> main() async {
   );
   prefs = await SharedPreferences.getInstance();
   if (!prefs.containsKey('alarms')) {
-    await prefs.setString('alarms',
-        Alarm.encodeAlarms([Alarm(id: 0, hour: 15, minute: 27, isActive: false)]));
+    await prefs.setString(
+        'alarms',
+        Alarm.encodeAlarms(
+            [Alarm(id: 0, hour: 15, minute: 27, isActive: false)]));
   }
   runApp(MyApp());
 }
@@ -40,13 +42,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: _title,
       home: MyStatefulWidget(),
-      theme: ThemeData(primarySwatch: Colors.orange, brightness: Brightness.light),
+      theme:
+          ThemeData(primarySwatch: Colors.orange, brightness: Brightness.light),
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        snackBarTheme: SnackBarThemeData(
-            backgroundColor: Colors.white54
-        ),
+        snackBarTheme: SnackBarThemeData(backgroundColor: Colors.white54),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: Colors.white54,
         ),
@@ -74,8 +75,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; 
-      switch(index) {
+      _selectedIndex = index;
+      switch (index) {
         case 0:
           _appBarTitle = 'Alarm';
           break;
@@ -133,11 +134,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 }
 
-Widget _simplePopup() => PopupMenuButton<int>(
-  itemBuilder: (context) => [
-    PopupMenuItem(
-      value: 1,
-      child: Text("Settings"),
-    ),
-  ],
-);
+Widget _simplePopup() =>
+    PopupMenuButton<int>(
+      itemBuilder: (context) =>
+      [
+        PopupMenuItem(
+          value: 1,
+          child: Text("Settings"),
+        ),
+      ],
+    );
