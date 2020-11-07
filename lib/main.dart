@@ -1,13 +1,13 @@
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:alarm/stop_watch_widget.dart';
+import 'package:alarm/StopWatchWidget.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:alarm/alarm_widget.dart';
-import 'package:alarm/clock_widget.dart';
+import 'package:alarm/AlarmWidget.dart';
+import 'package:alarm/ClockWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:alarm/alarm_class.dart';
-import 'package:alarm/timer_widget.dart';
+import 'package:alarm/Alarm.dart';
+import 'package:alarm/TimerWidget.dart';
 
 SendPort uiSendPort;
 const String isolateName = 'isolate';

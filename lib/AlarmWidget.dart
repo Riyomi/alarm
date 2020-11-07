@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:alarm/alarm_class.dart';
+import 'package:alarm/Alarm.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:alarm/main.dart';
