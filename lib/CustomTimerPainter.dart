@@ -15,7 +15,7 @@ class CustomTimerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..color = backgroundColor
-      ..strokeWidth = 10.0
+      ..strokeWidth = 7.5
       ..strokeCap = StrokeCap.butt
       ..style = PaintingStyle.stroke;
 

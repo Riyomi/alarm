@@ -27,73 +27,64 @@ class _CountDownTimerState extends State<CountDownTimer>
   @override
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
-    return Scaffold(
-      backgroundColor: Colors.white10,
-      body: AnimatedBuilder(
-          animation: controller,
-          builder: (context, child) {
-            return Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    color: Colors.amber,
-                    height:
-                        controller.value * MediaQuery.of(context).size.height,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        child: Align(
-                          alignment: FractionalOffset.center,
-                          child: AspectRatio(
-                            aspectRatio: 1.0,
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                      painter: CustomTimerPainter(
-                                    animation: controller,
-                                    backgroundColor: Colors.white,
-                                    color: themeData.indicatorColor,
-                                  )),
+    return AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          return Stack(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: Align(
+                        alignment: FractionalOffset.center,
+                        child: AspectRatio(
+                          aspectRatio: 1.0,
+                          child: Stack(
+                            children: <Widget>[
+                              Positioned.fill(
+                                child: CustomPaint(
+                                    painter: CustomTimerPainter(
+                                  animation: controller,
+                                  backgroundColor: Colors.white,
+                                  color: themeData.indicatorColor,
+                                )),
+                              ),
+                              Align(
+                                alignment: FractionalOffset.center,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      timerString,
+                                      style: TextStyle(
+                                          fontSize: 50.0, color: Colors.white),
+                                    ),
+                                  ],
                                 ),
-                                Align(
-                                  alignment: FractionalOffset.center,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        "Count Down Timer",
-                                        style: TextStyle(
-                                            fontSize: 20.0,
-                                            color: Colors.white),
-                                      ),
-                                      Text(
-                                        timerString,
-                                        style: TextStyle(
-                                            fontSize: 112.0,
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      AnimatedBuilder(
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
+  }
+}
+
+/*AnimatedBuilder(
                           animation: controller,
                           builder: (context, child) {
-                            return FloatingActionButton.extended(
+                            return FloatingActionButton(
                                 onPressed: () {
                                   if (controller.isAnimating)
                                     controller.stop();
@@ -104,18 +95,7 @@ class _CountDownTimerState extends State<CountDownTimer>
                                             : controller.value);
                                   }
                                 },
-                                icon: Icon(controller.isAnimating
+                                child: Icon(controller.isAnimating
                                     ? Icons.pause
                                     : Icons.play_arrow),
-                                label: Text(
-                                    controller.isAnimating ? "Pause" : "Play"));
-                          }),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
-    );
-  }
-}
+                          }),*/

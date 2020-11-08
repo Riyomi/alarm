@@ -27,8 +27,7 @@ class Alarm {
         'isActive': alarm.isActive,
       };
 
-  static String encodeAlarms(List<Alarm> alarms) =>
-      json.encode(
+  static String encodeAlarms(List<Alarm> alarms) => json.encode(
         alarms
             .map<Map<String, dynamic>>((alarm) => Alarm.toMap(alarm))
             .toList(),
