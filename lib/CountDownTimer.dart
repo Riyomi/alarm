@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:alarm/CustomTimerPainter.dart';
 
 class CountDownTimer extends StatefulWidget {
+  final Duration duration;
+
+  const CountDownTimer({Key key, this.duration}) : super(key: key);
+
   @override
   _CountDownTimerState createState() => _CountDownTimerState();
 }
 
 class _CountDownTimerState extends State<CountDownTimer>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   AnimationController controller;
 
   String get timerString {
-    Duration duration = controller.duration * controller.value;
-    return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    //  Duration duration = controller.duration * controller.value;
+    return '${widget.duration.inMinutes}:${(widget.duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -20,13 +24,12 @@ class _CountDownTimerState extends State<CountDownTimer>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5),
+      duration: widget.duration,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData themeData = Theme.of(context);
     return AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
@@ -47,9 +50,9 @@ class _CountDownTimerState extends State<CountDownTimer>
                               Positioned.fill(
                                 child: CustomPaint(
                                     painter: CustomTimerPainter(
-                                  animation: controller,
-                                  backgroundColor: Colors.white,
-                                  color: themeData.indicatorColor,
+                                      animation: controller,
+                                      backgroundColor: Colors.white,
+                                      color: Colors.orange,
                                 )),
                               ),
                               Align(

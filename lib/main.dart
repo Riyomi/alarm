@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: _title,
-      home: MyStatefulWidget(),
+      home: HomePage(),
       theme:
           ThemeData(primarySwatch: Colors.orange, brightness: Brightness.light),
       themeMode: ThemeMode.dark,
@@ -56,14 +56,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({Key key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
 
   @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+  _HomePage createState() => _HomePage();
 }
 
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+class _HomePage extends State<HomePage> {
   int _selectedIndex = 0;
   String _appBarTitle = 'Alarm';
   List<Widget> _widgetOptions = <Widget>[
