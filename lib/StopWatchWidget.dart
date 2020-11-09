@@ -13,43 +13,48 @@ class _StopwatchWidget extends State<StopwatchWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(height: 30),
-        Text(format(_elapsedTime),
-            style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
-        ButtonBar(
-          children: [
-            ElevatedButton(
-                child: Row(children: <Widget>[
-                  //TODO: change the buttons to round ones without all this color bs (see Google's app as a reference)
-                  _stopwatchStarted
-                      ? Icon(Icons.pause)
-                      : Icon(Icons.play_arrow),
-                  _stopwatchStarted ? Text('Pause') : Text('Start'),
-                ]),
-                style: _stopwatchStarted
-                    ? ElevatedButton.styleFrom(primary: Colors.lime)
-                    : ElevatedButton.styleFrom(primary: Colors.green),
-                onPressed: () {
-                  if (_stopwatchStarted) {
-                    pauseStopwatch();
-                  } else {
-                    startStopwatch();
-                  }
-                  _stopwatchStarted = !_stopwatchStarted;
-                }),
-            ElevatedButton(
-                child: Row(
-                  children: [Icon(Icons.stop), Text('Reset')],
-                ),
-                style: ElevatedButton.styleFrom(primary: Colors.red),
-                onPressed: resetStopwatch)
-          ],
-          alignment: MainAxisAlignment.center,
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: 30),
+          FittedBox(
+            child: Text(format(_elapsedTime),
+                style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
+          ),
+          ButtonBar(
+            children: [
+              ElevatedButton(
+                  child: Row(children: <Widget>[
+                    //TODO: change the buttons to round ones without all this color bs (see Google's app as a reference)
+                    _stopwatchStarted
+                        ? Icon(Icons.pause)
+                        : Icon(Icons.play_arrow),
+                    _stopwatchStarted ? Text('Pause') : Text('Start'),
+                  ]),
+                  style: _stopwatchStarted
+                      ? ElevatedButton.styleFrom(primary: Colors.lime)
+                      : ElevatedButton.styleFrom(primary: Colors.green),
+                  onPressed: () {
+                    if (_stopwatchStarted) {
+                      pauseStopwatch();
+                    } else {
+                      startStopwatch();
+                    }
+                    _stopwatchStarted = !_stopwatchStarted;
+                  }),
+              ElevatedButton(
+                  child: Row(
+                    children: [Icon(Icons.stop), Text('Reset')],
+                  ),
+                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  onPressed: resetStopwatch)
+            ],
+            alignment: MainAxisAlignment.center,
+          ),
+        ],
+      ),
     );
   }
 

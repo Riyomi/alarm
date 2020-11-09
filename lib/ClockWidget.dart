@@ -13,15 +13,23 @@ class _ClockWidgetState extends State<ClockWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(height: 30),
-        Text(_now, style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        Text(_date,
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: 30),
+          FittedBox(
+              child: Text(_now,
+                  style:
+                      TextStyle(fontSize: 100, fontWeight: FontWeight.bold))),
+          SizedBox(height: 10),
+          FittedBox(
+            child: Text(_date,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
   }
 
