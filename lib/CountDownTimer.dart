@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:alarm/CustomTimerPainter.dart';
+import 'package:flutter/material.dart';
 
 class CountDownTimer extends StatefulWidget {
   final Duration duration;
@@ -50,9 +50,9 @@ class _CountDownTimerState extends State<CountDownTimer>
                               Positioned.fill(
                                 child: CustomPaint(
                                     painter: CustomTimerPainter(
-                                      animation: controller,
-                                      backgroundColor: Colors.white,
-                                      color: Colors.orange,
+                                  animation: controller,
+                                  backgroundColor: Colors.white,
+                                  color: Colors.orange,
                                 )),
                               ),
                               Align(

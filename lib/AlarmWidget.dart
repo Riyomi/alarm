@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'dart:ui';
-import 'package:flutter/material.dart';
+
 import 'package:alarm/Alarm.dart';
-import 'package:android_alarm_manager/android_alarm_manager.dart';
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:alarm/main.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+
+import 'DataBaseHandler.dart';
 
 class AlarmsWidget extends StatefulWidget {
   @override
@@ -12,8 +15,8 @@ class AlarmsWidget extends StatefulWidget {
 }
 
 class _AlarmsWidget extends State<AlarmsWidget> {
-  List<Widget> alarms;
-  List<Alarm> alarmsList;
+  List<Widget> alarmWidgets;
+  List<Alarm> alarms;
 
   @override
   Widget build(BuildContext context) {
@@ -39,21 +42,21 @@ class _AlarmsWidget extends State<AlarmsWidget> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
-            itemCount: alarms != null ? alarms.length : 0,
+            itemCount: alarmWidgets != null ? alarmWidgets.length : 0,
             itemBuilder: (context, index) {
+              final alarmWidget = alarmWidgets[index];
               final alarm = alarms[index];
-              final alarmWidget = alarmsList[index];
               return Column(
+                // TODO: Fix this error [RangeError (index): Invalid value: Not in inclusive range 0..1: 2] when undoing the removal of an item
                 // TODO: when the item is not removed, put it back to its original position (now it's placed to the end)
                 children: <Widget>[
                   Dismissible(
-                      key: Key(alarm.hashCode.toString()),
+                      key: Key(alarmWidget.hashCode.toString()),
                       onDismissed: (direction) {
                         if (direction == DismissDirection.startToEnd) {
                           Future<TimeOfDay> selectedTime = showTimePicker(
                             initialTime: TimeOfDay(
-                                hour: alarmWidget.hour,
-                                minute: alarmWidget.minute),
+                                hour: alarm.hour, minute: alarm.minute),
                             context: context,
                             builder: (BuildContext context, Widget child) {
                               return MediaQuery(
@@ -64,18 +67,15 @@ class _AlarmsWidget extends State<AlarmsWidget> {
                             },
                           );
                           selectedTime.then((time) => {
-                                if (time == null)
-                                  {
-                                    modifyAlarm(index, alarmWidget.hour,
-                                        alarmWidget.minute)
-                                  }
+                            if (time == null)
+                              {modifyAlarm(alarm, alarm.hour, alarm.minute)}
                                 else
-                                  {modifyAlarm(index, time.hour, time.minute)}
-                              });
+                              {modifyAlarm(alarm, time.hour, time.minute)}
+                          });
                         } else {
                           setState(() {
-                            alarms.removeAt(index);
-                            removeAlarm(index);
+                            alarmWidgets.removeAt(index);
+                            removeAlarm(alarm);
                           });
                           Scaffold.of(context).showSnackBar(SnackBar(
                               content: Text("Alarm deleted"),
@@ -83,16 +83,15 @@ class _AlarmsWidget extends State<AlarmsWidget> {
                                   label: "UNDO",
                                   onPressed: () {
                                     setState(() {
-                                      alarms.insert(index, alarm);
-                                      addNewAlarm(
-                                          alarmWidget.hour, alarmWidget.minute);
+                                      alarmWidgets.insert(index, alarmWidget);
+                                      addNewAlarm(alarm.hour, alarm.minute);
                                     });
                                   })));
                         }
                       },
                       background: modifyBackground(),
                       secondaryBackground: deleteBackground(),
-                      child: alarms[index]),
+                      child: alarmWidgets[index]),
                   Divider(color: Colors.white54)
                 ],
               );
@@ -101,32 +100,42 @@ class _AlarmsWidget extends State<AlarmsWidget> {
     );
   }
 
-  void addNewAlarm(int hour, int minute) {
-    alarmsList.add(Alarm(
-        id: alarmsList.last.id + 1,
-        hour: hour,
-        minute: minute,
-        isActive: false));
-    prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
-    setState(() {
-      alarms = createAlarmWidgets(alarmsList);
+  Future<void> addNewAlarm(int hour, int minute) async {
+    await insertAlarm(Alarm(hour: hour, minute: minute, isActive: false))
+        .then((value) =>
+    {
+      getAlarms().then((value) =>
+      {
+        alarms = value,
+        alarmWidgets = createAlarmWidgets(alarms),
+        setState(() {})
+      })
     });
   }
 
-  void removeAlarm(int index) {
-    alarmsList.removeAt(index);
-    prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
-    setState(() {
-      alarms = createAlarmWidgets(alarmsList);
+  Future<void> removeAlarm(Alarm alarm) async {
+    await deleteAlarm(alarm).then((value) =>
+    {
+      getAlarms().then((value) =>
+      {
+        alarms = value,
+        alarmWidgets = createAlarmWidgets(alarms),
+        setState(() {})
+      })
     });
   }
 
-  void modifyAlarm(int index, int hour, int minute) {
-    alarmsList.elementAt(index).hour = hour;
-    alarmsList.elementAt(index).minute = minute;
-    prefs.setString('alarms', Alarm.encodeAlarms(alarmsList));
-    setState(() {
-      alarms = createAlarmWidgets(alarmsList);
+  Future<void> modifyAlarm(Alarm alarm, int hour, int minute) async {
+    await updateAlarm(Alarm(
+        id: alarm.id, hour: hour, minute: minute, isActive: alarm.isActive))
+        .then((value) =>
+    {
+      getAlarms().then((value) =>
+      {
+        alarms = value,
+        alarmWidgets = createAlarmWidgets(alarms),
+        setState(() {})
+      })
     });
   }
 
@@ -157,13 +166,23 @@ class _AlarmsWidget extends State<AlarmsWidget> {
   @override
   void initState() {
     super.initState();
-    alarmsList = Alarm.decodeAlarms(prefs.getString('alarms'));
-    alarms = createAlarmWidgets(alarmsList);
-    setState(() {});
+    initializeDataBase();
+  }
+
+  Future<void> initializeDataBase() async {
+    await getAlarms().then((value) =>
+    {
+      alarms = value,
+      alarmWidgets = createAlarmWidgets(alarms),
+      setState(() {})
+    });
   }
 
   List<Widget> createAlarmWidgets(List<Alarm> alarms) {
     List<Widget> widgets = List<Widget>();
+    if (alarms == null) {
+      return null;
+    }
     for (Alarm alarm in alarms) {
       widgets.add(AlarmWidget(
           id: alarm.id,

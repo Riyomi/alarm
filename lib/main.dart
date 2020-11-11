@@ -1,13 +1,13 @@
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:alarm/StopWatchWidget.dart';
-import 'package:android_alarm_manager/android_alarm_manager.dart';
-import 'package:flutter/material.dart';
+
 import 'package:alarm/AlarmWidget.dart';
 import 'package:alarm/ClockWidget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:alarm/Alarm.dart';
+import 'package:alarm/StopWatchWidget.dart';
 import 'package:alarm/TimerWidget.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 SendPort uiSendPort;
 const String isolateName = 'isolate';
@@ -23,13 +23,7 @@ Future<void> main() async {
     port.sendPort,
     isolateName,
   );
-  prefs = await SharedPreferences.getInstance();
-  if (!prefs.containsKey('alarms')) {
-    await prefs.setString(
-        'alarms',
-        Alarm.encodeAlarms(
-            [Alarm(id: 0, hour: 15, minute: 27, isActive: false)]));
-  }
+
   runApp(MyApp());
 }
 
@@ -106,6 +100,7 @@ class _HomePage extends State<HomePage> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.access_alarm),
@@ -134,10 +129,8 @@ class _HomePage extends State<HomePage> {
   }
 }
 
-Widget _simplePopup() =>
-    PopupMenuButton<int>(
-      itemBuilder: (context) =>
-      [
+Widget _simplePopup() => PopupMenuButton<int>(
+      itemBuilder: (context) => [
         PopupMenuItem(
           value: 1,
           child: Text("Settings"),
