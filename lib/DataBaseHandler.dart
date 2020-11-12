@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'Alarm.dart';
+import 'Timer.dart';
 
 final _databaseName = 'alarm_app.db';
 
@@ -15,7 +16,10 @@ final Future<Database> database = getDatabasesPath().then((String path) {
         "id integer primary key autoincrement,"
         "hour integer not null,"
         "minute integer not null,"
-        "isActive integer not null)", // 0 or 1
+        "isActive integer not null)" // 0 or 1
+        "create table timers("
+        "id integer primary key autoincrement,"
+        "duration integer not null)",
       );
     },
     version: 1,
@@ -55,4 +59,30 @@ Future<List<Alarm>> getAlarms() async {
       isActive: maps[i]['isActive'] == 1,
     );
   });
+}
+
+Future<List<Timer>> getTimers() async {
+  final db = await database;
+
+  final List<Map<String, dynamic>> maps = await db.query('timers');
+
+  return List.generate(maps.length, (i) {
+    return Timer(
+      id: maps[i]['id'],
+      duration: Duration(seconds: maps[i]['duration']),
+    );
+  });
+}
+
+Future<void> insertTimer(Timer timer) async {
+  final Database db = await database;
+
+  await db.insert('timers', timer.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace);
+}
+
+Future<void> deleteTimer(Timer timer) async {
+  final db = await database;
+
+  await db.delete('timers', where: "id = ?", whereArgs: [timer.id]);
 }
