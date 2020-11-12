@@ -20,6 +20,7 @@ class _AlarmsWidget extends State<AlarmsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> alarmsCopy = List<Widget>();
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
@@ -47,8 +48,6 @@ class _AlarmsWidget extends State<AlarmsWidget> {
               final alarmWidget = alarmWidgets[index];
               final alarm = alarms[index];
               return Column(
-                // TODO: Fix this error [RangeError (index): Invalid value: Not in inclusive range 0..1: 2] when undoing the removal of an item
-                // TODO: when the item is not removed, put it back to its original position (now it's placed to the end)
                 children: <Widget>[
                   Dismissible(
                       key: Key(alarmWidget.hashCode.toString()),
@@ -67,26 +66,34 @@ class _AlarmsWidget extends State<AlarmsWidget> {
                             },
                           );
                           selectedTime.then((time) => {
-                            if (time == null)
-                              {modifyAlarm(alarm, alarm.hour, alarm.minute)}
+                                if (time == null)
+                                  {modifyAlarm(alarm, alarm.hour, alarm.minute)}
                                 else
-                              {modifyAlarm(alarm, time.hour, time.minute)}
-                          });
+                                  {modifyAlarm(alarm, time.hour, time.minute)}
+                              });
                         } else {
                           setState(() {
+                            alarmsCopy.addAll(alarmWidgets);
                             alarmWidgets.removeAt(index);
-                            removeAlarm(alarm);
                           });
-                          Scaffold.of(context).showSnackBar(SnackBar(
+                          Scaffold
+                              .of(context)
+                              .showSnackBar(SnackBar(
+                              duration: Duration(seconds: 1),
                               content: Text("Alarm deleted"),
                               action: SnackBarAction(
                                   label: "UNDO",
                                   onPressed: () {
                                     setState(() {
-                                      alarmWidgets.insert(index, alarmWidget);
-                                      addNewAlarm(alarm.hour, alarm.minute);
+                                      alarmWidgets = alarmsCopy;
                                     });
-                                  })));
+                                  })))
+                              .closed
+                              .then((SnackBarClosedReason reason) {
+                            if (reason != SnackBarClosedReason.action) {
+                              removeAlarm(alarm);
+                            }
+                          });
                         }
                       },
                       background: modifyBackground(),
