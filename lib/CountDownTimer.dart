@@ -10,13 +10,18 @@ class CountDownTimer extends StatefulWidget {
   _CountDownTimerState createState() => _CountDownTimerState();
 }
 
+//TODO: https://stackoverflow.com/questions/51029655/call-method-in-one-stateful-widget-from-another-stateful-widget-flutter
+
 class _CountDownTimerState extends State<CountDownTimer>
     with SingleTickerProviderStateMixin {
   AnimationController controller;
 
   String get timerString {
     //  Duration duration = controller.duration * controller.value;
-    return '${widget.duration.inMinutes}:${(widget.duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    if (widget.duration.inHours > 0) {
+      return '${widget.duration.inHours % 24}:${widget.duration.inMinutes % 60}:${(widget.duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    }
+    return '${widget.duration.inMinutes % 60}:${(widget.duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -75,6 +80,25 @@ class _CountDownTimerState extends State<CountDownTimer>
                         ),
                       ),
                     ),
+                    AnimatedBuilder(
+                        animation: controller,
+                        builder: (context, child) {
+                          return FloatingActionButton(
+                            onPressed: () {
+                              if (controller.isAnimating)
+                                controller.stop();
+                              else {
+                                controller.reverse(
+                                    from: controller.value == 0.0
+                                        ? 1.0
+                                        : controller.value);
+                              }
+                            },
+                            child: Icon(controller.isAnimating
+                                ? Icons.pause
+                                : Icons.play_arrow),
+                          );
+                        }),
                   ],
                 ),
               ),
@@ -83,22 +107,3 @@ class _CountDownTimerState extends State<CountDownTimer>
         });
   }
 }
-
-/*AnimatedBuilder(
-                          animation: controller,
-                          builder: (context, child) {
-                            return FloatingActionButton(
-                                onPressed: () {
-                                  if (controller.isAnimating)
-                                    controller.stop();
-                                  else {
-                                    controller.reverse(
-                                        from: controller.value == 0.0
-                                            ? 1.0
-                                            : controller.value);
-                                  }
-                                },
-                                child: Icon(controller.isAnimating
-                                    ? Icons.pause
-                                    : Icons.play_arrow),
-                          }),*/

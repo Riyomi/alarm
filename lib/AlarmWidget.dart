@@ -173,16 +173,15 @@ class _AlarmsWidget extends State<AlarmsWidget> {
   @override
   void initState() {
     super.initState();
-    initializeDataBase();
+    initializeAlarms();
   }
 
-  Future<void> initializeDataBase() async {
-    await getAlarms().then((value) =>
-    {
-      alarms = value,
-      alarmWidgets = createAlarmWidgets(alarms),
-      setState(() {})
-    });
+  Future<void> initializeAlarms() async {
+    await getAlarms().then((value) => {
+          alarms = value,
+          alarmWidgets = createAlarmWidgets(alarms),
+          setState(() {})
+        });
   }
 
   List<Widget> createAlarmWidgets(List<Alarm> alarms) {

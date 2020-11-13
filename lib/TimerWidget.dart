@@ -2,7 +2,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:numeric_keyboard/numeric_keyboard.dart';
+
 import 'CountDownTimer.dart';
+import 'DataBaseHandler.dart';
+import 'Timer.dart';
 
 class TimerWidget extends StatefulWidget {
   @override
@@ -13,32 +16,47 @@ class TimerWidget extends StatefulWidget {
 
 class _TimerWidgetState extends State<TimerWidget> {
   int _current = 0;
-  bool _displayAddPage;
-  List<CountDownTimer> _countDownTimers;
+  bool _displayAddPage = true;
+  List<CountDownTimer> _countDownTimers = List<CountDownTimer>();
+  List<Timer> _timers;
   String _text = "";
 
   @override
   Widget build(BuildContext context) {
-    return _displayAddPage ? addNewTimer : timersWithCarousel;
+    return _displayAddPage ? addNewTimerScaffold : timersWithCarousel;
   }
 
   @override
   void initState() {
     super.initState();
-    _countDownTimers = [
-      CountDownTimer(
-          duration: Duration(
-        minutes: 10,
-      )),
-      CountDownTimer(duration: Duration(minutes: 5)),
-      CountDownTimer(duration: Duration(minutes: 15)),
-    ];
+    initializeTimers();
+  }
 
-    if (_countDownTimers.length == 0) {
-      _displayAddPage = true;
-    } else {
-      _displayAddPage = false;
-    }
+  Future<void> initializeTimers() async {
+    await getTimers().then((value) => {
+          _timers = value,
+          if (_timers.isNotEmpty)
+            {
+              _displayAddPage = false,
+              _countDownTimers = List<CountDownTimer>(),
+              for (Timer timer in _timers)
+                {
+                  _countDownTimers.add(CountDownTimer(duration: timer.duration))
+                },
+            }
+          else
+            {_displayAddPage = true},
+          setState(() {})
+        });
+  }
+
+  Future<void> addNewTimer(Duration duration) async {
+    await insertTimer(Timer(duration: duration))
+        .then((value) => initializeTimers());
+  }
+
+  Future<void> removeTimer(Timer timer) async {
+    await deleteTimer(timer).then((value) => initializeTimers());
   }
 
   Widget get timersWithCarousel {
@@ -55,11 +73,13 @@ class _TimerWidgetState extends State<TimerWidget> {
             Spacer(),
             CarouselSlider(
               items: _countDownTimers,
-              options: CarouselOptions(onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
-              }),
+              options: CarouselOptions(
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _current = index;
+                    });
+                  },
+                  enableInfiniteScroll: false),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -89,12 +109,8 @@ class _TimerWidgetState extends State<TimerWidget> {
                       Expanded(
                           child: FlatButton(
                               onPressed: () {
-                                setState(() {
-                                  _countDownTimers.removeAt(_current);
-                                  if (_countDownTimers.length == 0) {
-                                    _displayAddPage = true;
-                                  }
-                                });
+                                _countDownTimers.removeAt(_current);
+                                removeTimer(_timers[_current]);
                               },
                               child: Text('Delete'))),
                       Spacer(),
@@ -113,14 +129,15 @@ class _TimerWidgetState extends State<TimerWidget> {
     );
   }
 
-  Widget get addNewTimer {
+  Widget get addNewTimerScaffold {
     return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Visibility(
           child: FloatingActionButton(
             child: Icon(Icons.play_arrow_outlined),
             onPressed: () {
-              print(stringAsDuration);
+              addNewTimer(stringAsDuration);
+              _text = '';
             },
           ),
           visible: _text.length > 0 ? true : false,
@@ -145,7 +162,7 @@ class _TimerWidgetState extends State<TimerWidget> {
               },
             ),
             Visibility(
-              visible: _countDownTimers.length > 0 ? true : false,
+              visible: _countDownTimers.isNotEmpty,
               child: Align(
                   alignment: Alignment.bottomLeft,
                   child: Padding(

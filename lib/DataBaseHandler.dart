@@ -11,16 +11,15 @@ final Future<Database> database = getDatabasesPath().then((String path) {
   return openDatabase(
     join(path, _databaseName),
     onCreate: (db, version) {
-      return db.execute(
-        "create table alarms("
-        "id integer primary key autoincrement,"
-        "hour integer not null,"
-        "minute integer not null,"
-        "isActive integer not null)" // 0 or 1
-        "create table timers("
-        "id integer primary key autoincrement,"
-        "duration integer not null)",
-      );
+      db.execute("create table alarms("
+          "id integer primary key autoincrement,"
+          "hour integer not null,"
+          "minute integer not null,"
+          "isActive integer not null)" // 0 or 1
+          );
+      db.execute("create table timers("
+          "id integer primary key autoincrement,"
+          "duration integer not null)");
     },
     version: 1,
   );
