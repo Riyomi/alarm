@@ -13,24 +13,35 @@ class CountDownTimer extends StatefulWidget {
 //TODO: https://stackoverflow.com/questions/51029655/call-method-in-one-stateful-widget-from-another-stateful-widget-flutter
 
 class _CountDownTimerState extends State<CountDownTimer>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   AnimationController controller;
+  AnimationController _textController;
 
   String get timerString {
-    //  Duration duration = controller.duration * controller.value;
-    if (widget.duration.inHours > 0) {
-      return '${widget.duration.inHours % 24}:${widget.duration.inMinutes % 60}:${(widget.duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    Duration duration = controller.duration * controller.value;
+    if (duration.inHours > 0) {
+      return '${duration.inHours % 24}:${duration.inMinutes % 60}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
     }
-    return '${widget.duration.inMinutes % 60}:${(widget.duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    return '${duration.inMinutes % 60}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
   void initState() {
     super.initState();
     controller = AnimationController(
+      value: 1,
       vsync: this,
       duration: widget.duration,
     );
+    _textController = AnimationController(
+        value: 1, vsync: this, duration: const Duration(milliseconds: 1000));
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    _textController.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,9 +66,9 @@ class _CountDownTimerState extends State<CountDownTimer>
                               Positioned.fill(
                                 child: CustomPaint(
                                     painter: CustomTimerPainter(
-                                  animation: controller,
-                                  backgroundColor: Colors.white,
-                                  color: Colors.orange,
+                                      animation: controller,
+                                      backgroundColor: Colors.orange,
+                                      color: Colors.white,
                                 )),
                               ),
                               Align(
@@ -67,10 +78,29 @@ class _CountDownTimerState extends State<CountDownTimer>
                                       MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
-                                    Text(
-                                      timerString,
-                                      style: TextStyle(
-                                          fontSize: 50.0, color: Colors.white),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (controller.isAnimating) {
+                                          controller.stop();
+                                          _textController.repeat(reverse: true);
+                                        } else {
+                                          _textController.stop();
+                                          _textController.value = 1;
+                                          controller.reverse(
+                                              from: controller.value == 0.0
+                                                  ? 1.0
+                                                  : controller.value);
+                                        }
+                                      },
+                                      child: FadeTransition(
+                                        opacity: _textController,
+                                        child: Text(
+                                          timerString,
+                                          style: TextStyle(
+                                              fontSize: 50.0,
+                                              color: Colors.white),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -80,25 +110,6 @@ class _CountDownTimerState extends State<CountDownTimer>
                         ),
                       ),
                     ),
-                    AnimatedBuilder(
-                        animation: controller,
-                        builder: (context, child) {
-                          return FloatingActionButton(
-                            onPressed: () {
-                              if (controller.isAnimating)
-                                controller.stop();
-                              else {
-                                controller.reverse(
-                                    from: controller.value == 0.0
-                                        ? 1.0
-                                        : controller.value);
-                              }
-                            },
-                            child: Icon(controller.isAnimating
-                                ? Icons.pause
-                                : Icons.play_arrow),
-                          );
-                        }),
                   ],
                 ),
               ),
